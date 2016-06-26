@@ -81,13 +81,13 @@ void loop()
     {
         case WAIT:
             Serial.readBytesUntil(';', commands[pc], 10);
-            if(strncmp(commands[pc], "RUN", 3) == 0)
+            if(strcmp(commands[pc], "RUN") == 0)
             {
                 pc = 0;
                 s = RUN;
                 break;
             }
-            if(strncmp(commands[pc], "CLEAR", 5) == 0)
+            if(strcmp(commands[pc], "CLEAR") == 0)
             {
                 clearProgram();
                 break;
@@ -95,12 +95,22 @@ void loop()
             pc++;
             break;
         case RUN:
-            if(strncmp(commands[pc], "RUN", 3) == 0)
+            if(strcmp(commands[pc], "RUN") == 0)
             {
                 s = WAIT;
+                Serial.println("READY:");
                 break;
             }
-            Serial.print(commands[pc]);
+            if(strcmp(commands[pc], "PAUSE") == 0)
+            {
+                if(leftMotor->isStopped()&&rightMotor->isStopped())
+                {
+                    pc++;
+                    break;
+                }
+            }
+            //If we reach this point, the current instruction is a motor movement
+            
             pc++;
             break;
     }

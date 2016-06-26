@@ -17,7 +17,7 @@ class RobotMotor
         RobotMotor(unsigned char red, unsigned char black, unsigned char enable);
     
         //Get current state
-        bool isRunning();
+        bool isStopped();
         
         //Check tick counter and stop motor if required.
         void refresh();

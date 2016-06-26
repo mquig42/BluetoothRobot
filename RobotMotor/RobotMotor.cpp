@@ -21,9 +21,9 @@ RobotMotor::RobotMotor(unsigned char red, unsigned char black, unsigned char ena
 }
 
 //Get current state
-bool RobotMotor::isRunning()
+bool RobotMotor::isStopped()
 {
-    return running;
+    return !running;
 }
 
 //Check tick counter and stop motor if required.
