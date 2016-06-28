@@ -43,8 +43,10 @@ uint8_t getNextToken(char *str, char sep, uint8_t start, char *out)
         out[i] = str[i+start];
         i++;
     }
+    //Add null terminator
+    out[i] = '\0';
     if(str[i+start])
-        return i + 1;
+        return i + start + 1;
     return 0;
 }
 
@@ -58,6 +60,27 @@ void clearProgram()
         commands[pc][0] = '\0';
     }
     pc = 0;
+}
+
+void execMotorCommand()
+{
+    RobotMotor *curMotor = leftMotor;
+    if(commands[pc][0] == 'R')
+    {
+        curMotor = rightMotor;
+    }
+    if(curMotor->isStopped())
+    {
+        Serial.println(commands[pc]);
+        uint8_t pos = 2;
+        char token[8];
+        pos = getNextToken(commands[pc], ',', pos, token);
+        int dist = atoi(token);
+        getNextToken(commands[pc], ',', pos, token);
+        int spd = atoi(token);
+        curMotor->move(dist, spd);
+        pc++;
+    }
 }
 
 void setup()
@@ -97,21 +120,25 @@ void loop()
         case RUN:
             if(strcmp(commands[pc], "RUN") == 0)
             {
-                s = WAIT;
-                Serial.println("READY:");
+                //Wait for motors to stop before we change states. Motors will not refresh in wait state
+                if((leftMotor->isStopped())&&(rightMotor->isStopped()))
+                {
+                    s = WAIT;
+                    Serial.println("READY:");
+                }
                 break;
             }
             if(strcmp(commands[pc], "PAUSE") == 0)
             {
-                if(leftMotor->isStopped()&&rightMotor->isStopped())
+                //Wait for motors to stop before moving to next instruction
+                if((leftMotor->isStopped())&&(rightMotor->isStopped()))
                 {
                     pc++;
-                    break;
                 }
+                break;
             }
             //If we reach this point, the current instruction is a motor movement
-            
-            pc++;
+            execMotorCommand();
             break;
     }
     

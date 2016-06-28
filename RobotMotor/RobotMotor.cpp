@@ -14,6 +14,7 @@ RobotMotor::RobotMotor(unsigned char red, unsigned char black, unsigned char ena
     this->red = red;
     this->black = black;
     this->enable = enable;
+    this->running = false;
     
     pinMode(red, OUTPUT);
     pinMode(black, OUTPUT);
